@@ -6,6 +6,40 @@
 let geographyData = [];      // All geography data from JSON
 let selectedZipData = [];    // Filtered data by zip code
 let isManualMode = false;    // Track if user is manually editing
+let currentLang = 'th';      // 'th' or 'en'
+
+// UI Labels Dictionary
+const uiLabels = {
+    headerTitle: { th: 'แก้ไขที่อยู่', en: 'Edit Address' },
+    zipLabel: { th: 'รหัสไปรษณีย์', en: 'Postal Code' },
+    zipPlaceholder: { th: 'กรอกรหัสไปรษณีย์', en: 'Enter Postal Code' },
+    zipError: { th: 'กรุณากรอกรหัสไปรษณีย์', en: 'Please enter postal code' },
+    provinceLabel: { th: 'จังหวัด', en: 'Province' },
+    provincePlaceholder: { th: 'เลือกจังหวัด', en: 'Select Province' },
+    provinceError: { th: 'กรุณาเลือกจังหวัด', en: 'Please select province' },
+    districtLabel: { th: 'เขต/อำเภอ', en: 'District' },
+    districtPlaceholder: { th: 'เลือกเขต/อำเภอ', en: 'Select District' },
+    districtError: { th: 'กรุณาเลือกเขต/อำเภอ', en: 'Please select district' },
+    subdistrictLabel: { th: 'แขวง/ตำบล', en: 'Subdistrict' },
+    subdistrictPlaceholder: { th: 'เลือกแขวง/ตำบล', en: 'Select Subdistrict' },
+    subdistrictError: { th: 'กรุณาเลือกแขวง/ตำบล', en: 'Please select subdistrict' },
+    houseNoLabel: { th: 'บ้านเลขที่', en: 'House No.' },
+    houseNoPlaceholder: { th: 'กรอกบ้านเลขที่', en: 'Enter House No.' },
+    houseNoError: { th: 'กรุณากรอกบ้านเลขที่', en: 'Please enter house no.' },
+    mooLabel: { th: 'หมู่', en: 'Village No.' },
+    mooPlaceholder: { th: 'กรอกหมู่', en: 'Enter Village No.' },
+    soiLabel: { th: 'ซอย', en: 'Soi' },
+    soiPlaceholder: { th: 'กรอกซอย', en: 'Enter Soi' },
+    buildingLabel: { th: 'หมู่บ้าน / อาคาร', en: 'Village / Building' },
+    buildingPlaceholder: { th: 'กรอกหมู่บ้าน/อาคาร', en: 'Enter Village / Building' },
+    streetLabel: { th: 'ถนน', en: 'Road' },
+    streetPlaceholder: { th: 'กรอกถนน', en: 'Enter Road' },
+    submitBtn: { th: 'ดำเนินการต่อ', en: 'Continue' },
+    modalTitle: { th: '📍 ยืนยันที่อยู่จัดส่งเอกสาร', en: '📍 Confirm Delivery Address' },
+    modalAddressLabel: { th: 'ที่อยู่', en: 'Address' },
+    confirmBtn: { th: 'ยืนยัน', en: 'Confirm' },
+    cancelBtn: { th: 'ยกเลิก', en: 'Cancel' }
+};
 
 // ===== DOM ELEMENTS =====
 const zipCodeInput = document.getElementById('zipCode');
@@ -19,6 +53,7 @@ const modalOverlay = document.getElementById('modalOverlay');
 const confirmBtn = document.getElementById('confirmBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const confirmAddress = document.getElementById('confirmAddress');
+const langToggle = document.getElementById('langToggle');
 
 // Learning Panel Elements
 const eventLog = document.getElementById('eventLog');
@@ -28,6 +63,114 @@ const stateZipCount = document.getElementById('stateZipCount');
 const stateProvince = document.getElementById('stateProvince');
 const stateDistrict = document.getElementById('stateDistrict');
 const stateSubdistrict = document.getElementById('stateSubdistrict');
+
+// ===== LANGUAGE FUNCTIONS =====
+function toggleLanguage() {
+    currentLang = currentLang === 'th' ? 'en' : 'th';
+    log(`🌐 Language switched to: ${currentLang.toUpperCase()}`, 'action');
+    
+    // Update button UI
+    const langTexts = langToggle.querySelectorAll('.lang-text');
+    langTexts.forEach(span => {
+        span.classList.toggle('active', span.textContent === currentLang.toUpperCase());
+    });
+    
+    updateUILabels();
+    
+    // Refresh Dropdowns with new language
+    // We save current selection to restore it if possible
+    const currentProv = provinceSelect.value;
+    const currentDist = districtSelect.value;
+    const currentSub = subdistrictSelect.value;
+    
+    // Re-populate using active data source
+    // Note: This reuse logic will automatically pick correct language based on currentLang global
+    const dataSource = getActiveDataSource();
+    
+    // Repopulate Province
+    const provinces = getUniqueProvinces(dataSource);
+    populateProvinces(provinces);
+    provinceSelect.value = currentProv;
+    
+    // Repopulate District (if province selected)
+    if (currentProv) {
+        const districts = getDistrictsByProvince(dataSource, currentProv);
+        populateDistricts(districts);
+        districtSelect.value = currentDist;
+    } else {
+         districtSelect.innerHTML = `<option value="">${uiLabels.districtPlaceholder[currentLang]}</option>`;
+    }
+    
+    // Repopulate Subdistrict (if district selected)
+    if (currentDist) {
+        const subdistricts = getSubdistrictsByDistrict(dataSource, currentDist);
+        populateSubdistricts(subdistricts);
+        subdistrictSelect.value = currentSub;
+    } else {
+        subdistrictSelect.innerHTML = `<option value="">${uiLabels.subdistrictPlaceholder[currentLang]}</option>`;
+    }
+    
+    updateState();
+    updateOutputPreview();
+}
+
+function updateUILabels() {
+    // Header
+    document.querySelector('.header-title').textContent = uiLabels.headerTitle[currentLang];
+    
+    // Labels & Placeholders
+    // Helper to update label and placeholder/error
+    const setField = (id, key) => {
+        // Label
+        const label = document.querySelector(`label[for="${id}"]`);
+        if (label) {
+            const req = label.querySelector('.required') ? '<span class="required">*</span>' : '';
+            label.innerHTML = `${uiLabels[key + 'Label'][currentLang]}${req}`;
+        }
+        
+        // Input/Select placeholder (for inputs) or default option (for selects)
+        const element = document.getElementById(id);
+        if (element) {
+            if (element.tagName === 'INPUT') {
+                element.placeholder = uiLabels[key + 'Placeholder'][currentLang];
+            } else if (element.tagName === 'SELECT') {
+                // Update first option text
+                if (element.options.length > 0 && element.options[0].value === "") {
+                    element.options[0].textContent = uiLabels[key + 'Placeholder'][currentLang];
+                }
+            }
+        }
+        
+        // Error message
+        const group = document.getElementById(id + (id === 'zipCode' ? 'Group' : '') + (id === 'houseNo' ? 'Group' : ''));
+        if (!group && ['province','district','subdistrict'].includes(id)) {
+             // dropdown groups logic (provinceGroup etc.)
+             const g = document.getElementById(id + 'Group');
+             if(g) g.querySelector('.error-message').textContent = uiLabels[key + 'Error'][currentLang];
+        } else if (group) {
+             const err = group.querySelector('.error-message');
+             if(err) err.textContent = uiLabels[key + 'Error'][currentLang];
+        }
+    };
+    
+    setField('zipCode', 'zip');
+    setField('province', 'province');
+    setField('district', 'district');
+    setField('subdistrict', 'subdistrict');
+    setField('houseNo', 'houseNo');
+    setField('moo', 'moo');
+    setField('soi', 'soi');
+    setField('buildingName', 'building');
+    setField('streetName', 'street');
+    
+    document.querySelector('.submit-btn').textContent = uiLabels.submitBtn[currentLang];
+    
+    // Modal
+    document.querySelector('.modal-title').textContent = uiLabels.modalTitle[currentLang];
+    document.querySelector('.address-label').textContent = uiLabels.modalAddressLabel[currentLang];
+    confirmBtn.textContent = uiLabels.confirmBtn[currentLang];
+    cancelBtn.textContent = uiLabels.cancelBtn[currentLang];
+}
 
 // ===== LOGGING FUNCTIONS (For Learning Panel) =====
 function log(message, type = 'info') {
@@ -163,7 +306,9 @@ function searchZipCodes(query) {
             results.push({
                 postalCode: zipStr,
                 districtNameTh: item.districtNameTh,
-                provinceNameTh: item.provinceNameTh
+                districtNameEn: item.districtNameEn,
+                provinceNameTh: item.provinceNameTh,
+                provinceNameEn: item.provinceNameEn
             });
         }
         if (results.length >= 10) break; // Limit to 10 results
@@ -186,12 +331,15 @@ function showZipSuggestions(query) {
     }
     
     // Build suggestion HTML
-    zipSuggestions.innerHTML = results.map(item => `
+    zipSuggestions.innerHTML = results.map(item => {
+        const district = currentLang === 'th' ? item.districtNameTh : item.districtNameEn;
+        const province = currentLang === 'th' ? item.provinceNameTh : item.provinceNameEn;
+        return `
         <div class="suggestion-item" data-zip="${item.postalCode}">
             <span>${item.postalCode}</span>
-            <span class="district-name">${item.districtNameTh}</span>
+            <span class="district-name">${district}, ${province}</span>
         </div>
-    `).join('');
+    `}).join('');
     
     zipSuggestions.classList.add('show');
     
@@ -234,12 +382,17 @@ function getUniqueProvinces(data) {
         if (!map.has(item.provinceCode)) {
             map.set(item.provinceCode, {
                 code: item.provinceCode,
-                nameTh: item.provinceNameTh
+                nameTh: item.provinceNameTh,
+                nameEn: item.provinceNameEn
             });
         }
     });
-    // Sort alphabetically in Thai
-    return Array.from(map.values()).sort((a, b) => a.nameTh.localeCompare(b.nameTh, 'th'));
+    // Sort alphabetically based on current language
+    return Array.from(map.values()).sort((a, b) => {
+        const nameA = currentLang === 'th' ? a.nameTh : a.nameEn;
+        const nameB = currentLang === 'th' ? b.nameTh : b.nameEn;
+        return nameA.localeCompare(nameB, currentLang);
+    });
 }
 
 /**
@@ -255,11 +408,16 @@ function getDistrictsByProvince(data, provinceCode) {
             map.set(item.districtCode, {
                 code: item.districtCode,
                 nameTh: item.districtNameTh,
+                nameEn: item.districtNameEn,
                 provinceCode: item.provinceCode
             });
         }
     });
-    return Array.from(map.values()).sort((a, b) => a.nameTh.localeCompare(b.nameTh, 'th'));
+    return Array.from(map.values()).sort((a, b) => {
+        const nameA = currentLang === 'th' ? a.nameTh : a.nameEn;
+        const nameB = currentLang === 'th' ? b.nameTh : b.nameEn;
+        return nameA.localeCompare(nameB, currentLang);
+    });
 }
 
 /**
@@ -275,12 +433,17 @@ function getSubdistrictsByDistrict(data, districtCode) {
             map.set(item.subdistrictCode, {
                 code: item.subdistrictCode,
                 nameTh: item.subdistrictNameTh,
+                nameEn: item.subdistrictNameEn,
                 postalCode: item.postalCode,
                 districtCode: item.districtCode
             });
         }
     });
-    return Array.from(map.values()).sort((a, b) => a.nameTh.localeCompare(b.nameTh, 'th'));
+    return Array.from(map.values()).sort((a, b) => {
+        const nameA = currentLang === 'th' ? a.nameTh : a.nameEn;
+        const nameB = currentLang === 'th' ? b.nameTh : b.nameEn;
+        return nameA.localeCompare(nameB, currentLang);
+    });
 }
 
 /**
@@ -293,25 +456,31 @@ function getActiveDataSource() {
 // ===== POPULATE DROPDOWN FUNCTIONS =====
 
 function populateProvinces(provinces) {
-    provinceSelect.innerHTML = '<option value="">เลือกจังหวัด</option>';
+    const placeholder = uiLabels.provincePlaceholder[currentLang];
+    provinceSelect.innerHTML = `<option value="">${placeholder}</option>`;
     provinces.forEach(p => {
-        provinceSelect.innerHTML += `<option value="${p.code}">${p.nameTh}</option>`;
+        const name = currentLang === 'th' ? p.nameTh : p.nameEn;
+        provinceSelect.innerHTML += `<option value="${p.code}">${name}</option>`;
     });
     provinceSelect.disabled = false;
 }
 
 function populateDistricts(districts) {
-    districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
+    const placeholder = uiLabels.districtPlaceholder[currentLang];
+    districtSelect.innerHTML = `<option value="">${placeholder}</option>`;
     districts.forEach(d => {
-        districtSelect.innerHTML += `<option value="${d.code}">${d.nameTh}</option>`;
+        const name = currentLang === 'th' ? d.nameTh : d.nameEn;
+        districtSelect.innerHTML += `<option value="${d.code}">${name}</option>`;
     });
     districtSelect.disabled = false;
 }
 
 function populateSubdistricts(subdistricts) {
-    subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
+    const placeholder = uiLabels.subdistrictPlaceholder[currentLang];
+    subdistrictSelect.innerHTML = `<option value="">${placeholder}</option>`;
     subdistricts.forEach(s => {
-        subdistrictSelect.innerHTML += `<option value="${s.code}" data-zip="${s.postalCode}">${s.nameTh}</option>`;
+        const name = currentLang === 'th' ? s.nameTh : s.nameEn;
+        subdistrictSelect.innerHTML += `<option value="${s.code}" data-zip="${s.postalCode}">${name}</option>`;
     });
     subdistrictSelect.disabled = false;
 }
@@ -544,13 +713,23 @@ function formatAddressDisplay(data) {
     
     // Use correct Thai prefix based on province
     // กรุงเทพมหานคร = แขวง/เขต, ต่างจังหวัด = ตำบล/อำเภอ
-    const isBangkok = data.city && data.city.includes('กรุงเทพ');
-    const subdistrictPrefix = isBangkok ? 'แขวง' : 'ตำบล';
-    const districtPrefix = isBangkok ? 'เขต' : 'อำเภอ';
+    const isBangkok = data.city && (data.city.includes('กรุงเทพ') || data.city.includes('Bangkok'));
     
-    if (data.tumbon) parts.push(`${subdistrictPrefix}${data.tumbon}`);
-    if (data.amphur) parts.push(`${districtPrefix}${data.amphur}`);
-    if (data.city) parts.push(data.city);
+    if (currentLang === 'th') {
+        const subdistrictPrefix = isBangkok ? 'แขวง' : 'ตำบล';
+        const districtPrefix = isBangkok ? 'เขต' : 'อำเภอ';
+        const provincePrefix = isBangkok ? '' : 'จังหวัด';
+        
+        if (data.tumbon) parts.push(`${subdistrictPrefix}${data.tumbon}`);
+        if (data.amphur) parts.push(`${districtPrefix}${data.amphur}`);
+        if (data.city) parts.push(`${provincePrefix}${data.city}`);
+    } else {
+        // EN format: just correct ordering is usually enough, prefixes optional
+        if (data.tumbon) parts.push(data.tumbon);
+        if (data.amphur) parts.push(data.amphur);
+        if (data.city) parts.push(data.city);
+    }
+
     if (data.zip) parts.push(data.zip);
     return parts.join(' ');
 }
@@ -573,12 +752,23 @@ function handleConfirm() {
     const addressData = getFormData();
     log('✅ Address confirmed!', 'action');
     console.log('Final Address Data:', addressData);
-    alert('ที่อยู่ถูกบันทึกเรียบร้อยแล้ว!\n\nดูข้อมูลใน Console');
+    
+    // Localized alert/message
+    const msg = currentLang === 'th' 
+        ? 'ที่อยู่ถูกบันทึกเรียบร้อยแล้ว!\n\nดูข้อมูลใน Console'
+        : 'Address saved successfully!\n\nCheck console for data.';
+        
+    alert(msg);
     modalOverlay.classList.remove('show');
 }
 
 // ===== EVENT LISTENERS =====
 function initEventListeners() {
+    // Language Toggle
+    if (langToggle) {
+        langToggle.addEventListener('click', toggleLanguage);
+    }
+
     // Zip code input
     zipCodeInput.addEventListener('input', (e) => {
         const value = e.target.value.replace(/\D/g, ''); // Numbers only

@@ -91,8 +91,43 @@ body {
     margin-left: 8px;
 }
 
-.github-btn-header {
+.header-actions {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lang-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: var(--transition);
+}
+
+.lang-btn:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.lang-text.active {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.lang-divider {
+    color: var(--border-color);
+}
+
+.github-btn-header {
     color: var(--text-primary);
     display: flex;
     align-items: center;
@@ -102,6 +137,7 @@ body {
     border-radius: 50%;
     transition: var(--transition);
 }
+
 
 .github-btn-header:hover {
     background: var(--bg-gray);
