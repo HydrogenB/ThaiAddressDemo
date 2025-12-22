@@ -122,7 +122,7 @@
         <!-- Right: Learning Panel -->
         <div class="learning-panel">
             <div class="learning-header">
-                <h2>🎓 Learning Panel for Junior Developers</h2>
+                <h2>🎓 Learning Panel for Developers</h2>
                 <p>ดูการทำงานของ Logic และ Pseudo Code แบบ Real-time</p>
             </div>
 
@@ -156,59 +156,24 @@
             <!-- Pseudo Code -->
             <div class="learning-section">
                 <h3>📝 Pseudo Code - Address Auto-fill Logic</h3>
-                <pre class="pseudo-code" id="pseudoCode">
-<span class="comment">// === Thai Address Auto-fill Algorithm ===</span>
-
-<span class="keyword">FUNCTION</span> onZipCodeInput(zipCode):
-    <span class="comment">// Step 1: Search matching zip codes</span>
-    results = <span class="function">searchZipCodes</span>(zipCode)
-    
-    <span class="keyword">IF</span> results.length > 0:
-        <span class="function">showSuggestions</span>(results)
-    <span class="keyword">ELSE</span>:
-        <span class="function">hideSuggestions</span>()
-
-<span class="keyword">FUNCTION</span> onZipCodeSelected(zipCode):
-    <span class="comment">// Step 2: Filter geography data by zip</span>
-    filteredData = <span class="function">filterByZipCode</span>(zipCode)
-    
-    <span class="comment">// Step 3: Extract unique provinces</span>
-    provinces = <span class="function">getUniqueProvinces</span>(filteredData)
-    <span class="function">populateDropdown</span>("province", provinces)
-    
-    <span class="comment">// Step 4: Auto-select if only one option</span>
-    <span class="keyword">IF</span> provinces.length == 1:
-        <span class="function">selectProvince</span>(provinces[0])
-        <span class="function">onProvinceChange</span>()
-
-<span class="keyword">FUNCTION</span> onProvinceChange(provinceCode):
-    <span class="comment">// Cascade: Filter districts</span>
-    districts = <span class="function">filterByProvince</span>(provinceCode)
-    <span class="function">populateDropdown</span>("district", districts)
-    
-    <span class="keyword">IF</span> districts.length == 1:
-        <span class="function">onDistrictChange</span>(districts[0])
-
-<span class="keyword">FUNCTION</span> onDistrictChange(districtCode):
-    <span class="comment">// Cascade: Filter subdistricts</span>
-    subdistricts = <span class="function">filterByDistrict</span>(districtCode)
-    <span class="function">populateDropdown</span>("subdistrict", subdistricts)
-
-<span class="comment">// === Edge Case: Manual Edit ===</span>
-<span class="keyword">FUNCTION</span> onManualEdit(field, value):
-    <span class="comment">// Switch to MANUAL_MODE</span>
-    mode = MANUAL_MODE
-    dataSource = fullGeographyData
-    
-    <span class="keyword">IF</span> field == "province":
-        <span class="function">updateDistrictOptions</span>()
-        <span class="function">clearSubdistrict</span>()
-    <span class="keyword">ELSE IF</span> field == "district":
-        <span class="function">updateSubdistrictOptions</span>()
-    <span class="keyword">ELSE IF</span> field == "subdistrict":
-        <span class="comment">// Sync zip code with selected area</span>
-        <span class="function">updateZipCode</span>(subdistrict.postalCode)
-                </pre>
+                <div class="pseudo-code" id="pseudoCode">
+<div class="code-line" data-line="init"><span class="comment">// === Thai Address Auto-fill Algorithm ===</span></div>
+<div class="code-line" data-line="zip-input"><span class="keyword">FUNCTION</span> onZipCodeInput(zipCode):</div>
+<div class="code-line" data-line="zip-search">    results = <span class="function">searchZipCodes</span>(zipCode)</div>
+<div class="code-line" data-line="zip-show">    <span class="keyword">IF</span> results.length > 0: <span class="function">showSuggestions</span>(results)</div>
+<div class="code-line" data-line="zip-selected"><span class="keyword">FUNCTION</span> onZipCodeSelected(zipCode):</div>
+<div class="code-line" data-line="zip-filter">    filteredData = <span class="function">filterByZipCode</span>(zipCode)</div>
+<div class="code-line" data-line="zip-province">    provinces = <span class="function">getUniqueProvinces</span>(filteredData)</div>
+<div class="code-line" data-line="zip-populate">    <span class="function">populateDropdown</span>("province", provinces)</div>
+<div class="code-line" data-line="province-change"><span class="keyword">FUNCTION</span> onProvinceChange(provinceCode):</div>
+<div class="code-line" data-line="province-filter">    districts = <span class="function">filterByProvince</span>(provinceCode)</div>
+<div class="code-line" data-line="province-populate">    <span class="function">populateDropdown</span>("district", districts)</div>
+<div class="code-line" data-line="district-change"><span class="keyword">FUNCTION</span> onDistrictChange(districtCode):</div>
+<div class="code-line" data-line="district-filter">    subdistricts = <span class="function">filterByDistrict</span>(districtCode)</div>
+<div class="code-line" data-line="district-populate">    <span class="function">populateDropdown</span>("subdistrict", subdistricts)</div>
+<div class="code-line" data-line="subdistrict-change"><span class="keyword">FUNCTION</span> onSubdistrictChange():</div>
+<div class="code-line" data-line="subdistrict-sync">    <span class="function">syncZipCode</span>(subdistrict.postalCode)</div>
+                </div>
             </div>
 
             <!-- Event Log -->
@@ -241,9 +206,7 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
-                <span class="modal-brand">true</span>
-                <span class="modal-brand dtac">dtac</span>
-                <span class="modal-title">ยืนยันที่อยู่จัดส่งเอกสาร</span>
+                <span class="modal-title">📍 ยืนยันที่อยู่จัดส่งเอกสาร</span>
             </div>
             <div class="modal-body">
                 <div class="address-icon">📍</div>
