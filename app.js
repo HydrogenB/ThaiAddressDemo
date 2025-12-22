@@ -128,15 +128,19 @@ async function loadGeographyData() {
 
 // ===== INITIALIZE ALL PROVINCES =====
 function initializeAllProvinces() {
+    // 1. Load only provinces (Fast)
     const provinces = getUniqueProvinces(geographyData);
     populateProvinces(provinces);
-    // ALL dropdowns enabled from start for maximum flexibility
+    
+    // 2. Enable ONLY province selection
     provinceSelect.disabled = false;
-    // District and subdistrict populated with all options for manual selection
-    const allDistricts = getDistrictsByProvince(geographyData, null);
-    populateDistrictsAll(allDistricts);
-    const allSubdistricts = getSubdistrictsByDistrict(geographyData, null);
-    populateSubdistrictsAll(allSubdistricts);
+    
+    // 3. Reset and disable dependent dropdowns
+    districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
+    districtSelect.disabled = true;
+    
+    subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
+    subdistrictSelect.disabled = true;
 }
 
 // ===== ZIP CODE FUNCTIONS =====
@@ -312,23 +316,7 @@ function populateSubdistricts(subdistricts) {
     subdistrictSelect.disabled = false;
 }
 
-// Populate ALL districts (grouped by province for better UX)
-function populateDistrictsAll(districts) {
-    districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
-    districts.forEach(d => {
-        districtSelect.innerHTML += `<option value="${d.code}" data-province="${d.provinceCode}">${d.nameTh}</option>`;
-    });
-    districtSelect.disabled = false;
-}
 
-// Populate ALL subdistricts
-function populateSubdistrictsAll(subdistricts) {
-    subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
-    subdistricts.forEach(s => {
-        subdistrictSelect.innerHTML += `<option value="${s.code}" data-zip="${s.postalCode}" data-district="${s.districtCode}">${s.nameTh}</option>`;
-    });
-    subdistrictSelect.disabled = false;
-}
 
 // ===== EVENT HANDLERS =====
 
