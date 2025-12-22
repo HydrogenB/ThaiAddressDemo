@@ -91,6 +91,23 @@ body {
     margin-left: 8px;
 }
 
+.github-btn-header {
+    margin-left: auto;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.github-btn-header:hover {
+    background: var(--bg-gray);
+    color: #333;
+}
+
 /* ===== Form ===== */
 .address-form {
     flex: 1;
@@ -624,6 +641,34 @@ body {
 
 .credits-info a:hover {
     text-decoration: underline;
+}
+
+.download-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn-download {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #2a2a3a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #E0E0E0;
+    text-decoration: none;
+    font-size: 11px;
+    font-family: 'Fira Code', monospace;
+    transition: var(--transition);
+}
+
+.btn-download:hover {
+    background: #333344;
+    border-color: #4FC3F7;
+    color: #4FC3F7;
 }
 
 /* ===== Changelog ===== */
