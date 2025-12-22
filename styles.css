@@ -128,7 +128,7 @@ body {
 }
 
 .github-btn-header {
-    color: var(--text-primary);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -136,12 +136,14 @@ body {
     height: 40px;
     border-radius: 50%;
     transition: var(--transition);
+    opacity: 0.6;
 }
 
 
 .github-btn-header:hover {
     background: var(--bg-gray);
-    color: #333;
+    color: var(--text-primary);
+    opacity: 1;
 }
 
 /* ===== Form ===== */
