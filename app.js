@@ -75,24 +75,22 @@ async function loadGeographyData() {
         log(`❌ Error loading data: ${error.message}`, 'error');
         console.error('Error loading geography data:', error);
         
-        // Show helpful error message for CORS issue
-        const isFileProtocol = window.location.protocol === 'file:';
-        if (isFileProtocol) {
-            const message = `⚠️ CORS Error - ไม่สามารถโหลดข้อมูลได้
-
-เนื่องจากคุณเปิดไฟล์โดยตรง (file://) Browser จะบล็อก fetch requests
-
-วิธีแก้ไข:
-1. ใช้ VS Code + Live Server Extension
-2. หรือรัน: npx serve .
-3. หรือรัน: python -m http.server 8000
-
-แล้วเปิด http://localhost:5500 หรือ http://localhost:8000`;
-            
-            alert(message);
-            log('💡 Solution: Use a local web server (Live Server, npx serve, etc.)', 'error');
-        } else {
-            alert('ไม่สามารถโหลดข้อมูลที่อยู่ได้ กรุณาลองใหม่อีกครั้ง');
+        // Show error in the form panel
+        const formPanel = document.querySelector('.address-form');
+        if (formPanel) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'load-error';
+            errorDiv.innerHTML = `
+                <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                    <strong style="color: #856404;">⚠️ ไม่สามารถโหลดข้อมูลที่อยู่ได้</strong>
+                    <p style="color: #856404; margin: 8px 0 0 0; font-size: 14px;">
+                        ${window.location.protocol === 'file:' 
+                            ? 'กรุณาเปิดผ่าน Web Server (เช่น GitHub Pages, Live Server)' 
+                            : 'กรุณาตรวจสอบว่าไฟล์ geography.json อยู่ถูกที่'}
+                    </p>
+                </div>
+            `;
+            formPanel.insertBefore(errorDiv, formPanel.firstChild);
         }
     }
 }
