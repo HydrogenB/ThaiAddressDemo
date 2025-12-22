@@ -73,10 +73,23 @@ function highlightCode(lineId) {
 async function loadGeographyData() {
     log('📥 Loading geography.json...', 'action');
     
+    // Show loading indicator on form fields
+    const loadingMsg = 'กำลังโหลดข้อมูล...';
+    provinceSelect.innerHTML = `<option value="">${loadingMsg}</option>`;
+    districtSelect.innerHTML = `<option value="">${loadingMsg}</option>`;
+    subdistrictSelect.innerHTML = `<option value="">${loadingMsg}</option>`;
+    
     try {
         const response = await fetch('geography.json');
         if (!response.ok) throw new Error('Failed to load data');
-        geographyData = await response.json();
+        
+        // Parse JSON in chunks to avoid blocking main thread
+        const text = await response.text();
+        
+        // Use setTimeout to let the UI breathe
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
+        geographyData = JSON.parse(text);
         
         log(`✅ Loaded ${geographyData.length} geography records`, 'action');
         
@@ -87,6 +100,11 @@ async function loadGeographyData() {
     } catch (error) {
         log(`❌ Error loading data: ${error.message}`, 'error');
         console.error('Error loading geography data:', error);
+        
+        // Reset dropdowns on error
+        provinceSelect.innerHTML = '<option value="">เลือกจังหวัด</option>';
+        districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
+        subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
         
         // Show error in the form panel
         const formPanel = document.querySelector('.address-form');
