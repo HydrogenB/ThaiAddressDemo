@@ -112,10 +112,13 @@ async function loadGeographyData() {
 function initializeAllProvinces() {
     const provinces = getUniqueProvinces(geographyData);
     populateProvinces(provinces);
-    // Enable province dropdown from the start for manual selection
+    // ALL dropdowns enabled from start for maximum flexibility
     provinceSelect.disabled = false;
-    districtSelect.disabled = true;
-    subdistrictSelect.disabled = true;
+    // District and subdistrict populated with all options for manual selection
+    const allDistricts = getDistrictsByProvince(geographyData, null);
+    populateDistrictsAll(allDistricts);
+    const allSubdistricts = getSubdistrictsByDistrict(geographyData, null);
+    populateSubdistrictsAll(allSubdistricts);
 }
 
 // ===== ZIP CODE FUNCTIONS =====
@@ -218,37 +221,43 @@ function getUniqueProvinces(data) {
 }
 
 /**
- * Get districts filtered by province
+ * Get districts filtered by province (or all if null)
  */
 function getDistrictsByProvince(data, provinceCode) {
     const map = new Map();
-    data.filter(item => item.provinceCode === parseInt(provinceCode))
-        .forEach(item => {
-            if (!map.has(item.districtCode)) {
-                map.set(item.districtCode, {
-                    code: item.districtCode,
-                    nameTh: item.districtNameTh
-                });
-            }
-        });
+    const filtered = provinceCode 
+        ? data.filter(item => item.provinceCode === parseInt(provinceCode))
+        : data;
+    filtered.forEach(item => {
+        if (!map.has(item.districtCode)) {
+            map.set(item.districtCode, {
+                code: item.districtCode,
+                nameTh: item.districtNameTh,
+                provinceCode: item.provinceCode
+            });
+        }
+    });
     return Array.from(map.values()).sort((a, b) => a.nameTh.localeCompare(b.nameTh, 'th'));
 }
 
 /**
- * Get subdistricts filtered by district
+ * Get subdistricts filtered by district (or all if null)
  */
 function getSubdistrictsByDistrict(data, districtCode) {
     const map = new Map();
-    data.filter(item => item.districtCode === parseInt(districtCode))
-        .forEach(item => {
-            if (!map.has(item.subdistrictCode)) {
-                map.set(item.subdistrictCode, {
-                    code: item.subdistrictCode,
-                    nameTh: item.subdistrictNameTh,
-                    postalCode: item.postalCode
-                });
-            }
-        });
+    const filtered = districtCode 
+        ? data.filter(item => item.districtCode === parseInt(districtCode))
+        : data;
+    filtered.forEach(item => {
+        if (!map.has(item.subdistrictCode)) {
+            map.set(item.subdistrictCode, {
+                code: item.subdistrictCode,
+                nameTh: item.subdistrictNameTh,
+                postalCode: item.postalCode,
+                districtCode: item.districtCode
+            });
+        }
+    });
     return Array.from(map.values()).sort((a, b) => a.nameTh.localeCompare(b.nameTh, 'th'));
 }
 
@@ -281,6 +290,24 @@ function populateSubdistricts(subdistricts) {
     subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
     subdistricts.forEach(s => {
         subdistrictSelect.innerHTML += `<option value="${s.code}" data-zip="${s.postalCode}">${s.nameTh}</option>`;
+    });
+    subdistrictSelect.disabled = false;
+}
+
+// Populate ALL districts (grouped by province for better UX)
+function populateDistrictsAll(districts) {
+    districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
+    districts.forEach(d => {
+        districtSelect.innerHTML += `<option value="${d.code}" data-province="${d.provinceCode}">${d.nameTh}</option>`;
+    });
+    districtSelect.disabled = false;
+}
+
+// Populate ALL subdistricts
+function populateSubdistrictsAll(subdistricts) {
+    subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
+    subdistricts.forEach(s => {
+        subdistrictSelect.innerHTML += `<option value="${s.code}" data-zip="${s.postalCode}" data-district="${s.districtCode}">${s.nameTh}</option>`;
     });
     subdistrictSelect.disabled = false;
 }
@@ -445,16 +472,12 @@ function onSubdistrictChange(isUserAction = true) {
 }
 
 /**
- * Reset all location dropdowns
+ * Reset all location dropdowns - keeps them fully interactive
  */
 function resetLocationDropdowns() {
     log('🔄 Reset all location dropdowns', 'action');
     
     initializeAllProvinces();
-    districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
-    districtSelect.disabled = true;
-    subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
-    subdistrictSelect.disabled = true;
     
     selectedZipData = [];
     isManualMode = false;
@@ -512,8 +535,15 @@ function formatAddressDisplay(data) {
     if (data.houseNo) parts.push(data.houseNo);
     if (data.buildingName) parts.push(data.buildingName);
     if (data.streetName) parts.push(data.streetName);
-    if (data.tumbon) parts.push(`แขวง${data.tumbon}`);
-    if (data.amphur) parts.push(`เขต${data.amphur}`);
+    
+    // Use correct Thai prefix based on province
+    // กรุงเทพมหานคร = แขวง/เขต, ต่างจังหวัด = ตำบล/อำเภอ
+    const isBangkok = data.city && data.city.includes('กรุงเทพ');
+    const subdistrictPrefix = isBangkok ? 'แขวง' : 'ตำบล';
+    const districtPrefix = isBangkok ? 'เขต' : 'อำเภอ';
+    
+    if (data.tumbon) parts.push(`${subdistrictPrefix}${data.tumbon}`);
+    if (data.amphur) parts.push(`${districtPrefix}${data.amphur}`);
     if (data.city) parts.push(data.city);
     if (data.zip) parts.push(data.zip);
     return parts.join(' ');

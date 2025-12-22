@@ -7,11 +7,11 @@
 - **Zip Code Auto-fill** - พิมพ์รหัสไปรษณีย์ → ระบบแนะนำและเติมที่อยู่อัตโนมัติ
 - **Cascading Dropdowns** - จังหวัด → อำเภอ → ตำบล เชื่อมโยงกัน
 - **Manual Edit Support** - แก้ไขจังหวัด/อำเภอ/ตำบลด้วยตัวเองได้
-- **Learning Panel** - แสดง Pseudo Code และ Event Log สำหรับ Junior Developers
+- **Learning Panel** - แสดง Pseudo Code และ Event Log สำหรับ Developers
 
 ## 🚀 Demo
 
-เปิดดูได้ที่: [GitHub Pages URL]
+เปิดดูได้ที่: **[https://hydrogenb.github.io/ThaiAddressDemo/](https://hydrogenb.github.io/ThaiAddressDemo/)**
 
 ## 📁 Files
 
@@ -52,7 +52,7 @@ ThaiAddressDemo/
 
 ## 🎓 Learning Panel
 
-สำหรับ Junior Developers - มี Panel ด้านขวาแสดง:
+สำหรับ Developers - มี Panel ด้านขวาแสดง:
 
 - **Pseudo Code** - Algorithm ของการ Auto-fill
 - **Current State** - สถานะปัจจุบัน (Mode, Selected Values)
@@ -69,18 +69,6 @@ ThaiAddressDemo/
 
 ขอบคุณผู้จัดทำข้อมูลที่เปิดให้ใช้งานสาธารณะ 🙏
 
-## 🛠 Local Development
-
-```bash
-# วิธีที่ 1: Python
-python -m http.server 8000
-# เปิด http://localhost:8000
-
-# วิธีที่ 2: Node.js
-npx serve .
-
-# วิธีที่ 3: VS Code
-# ใช้ Live Server Extension
 ```
 
 ## 📝 License
@@ -90,3 +78,4 @@ MIT License - Feel free to use and modify.
 ---
 
 Made with ❤️ for demonstrating Thai address form UX best practices.
+```
