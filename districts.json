@@ -1963,7 +1963,7 @@
     "id": 246,
     "provinceCode": 31,
     "districtCode": 3117,
-    "districtNameEn": "Non Din Daeng",
+    "districtNameEn": "Non Suwan",
     "districtNameTh": "โนนสุวรรณ",
     "postalCode": 31110
   },
@@ -2787,7 +2787,7 @@
     "id": 349,
     "provinceCode": 38,
     "districtCode": 3801,
-    "districtNameEn": "Bueng Kan",
+    "districtNameEn": "Mueang Bueng Kan",
     "districtNameTh": "เมืองบึงกาฬ",
     "postalCode": 38000
   },
@@ -3147,7 +3147,7 @@
     "id": 394,
     "provinceCode": 41,
     "districtCode": 4106,
-    "districtNameEn": "Nong Saeng",
+    "districtNameEn": "Nong Han",
     "districtNameTh": "หนองหาน",
     "postalCode": 41130
   },
@@ -4349,7 +4349,7 @@
     "districtCode": 5025,
     "districtNameEn": "Kanlayaniwatthana",
     "districtNameTh": "กัลยาณิวัฒนา",
-    "postalCode": 58130
+    "postalCode": 50270
   },
   {
     "id": 545,
@@ -4603,7 +4603,7 @@
     "id": 576,
     "provinceCode": 54,
     "districtCode": 5402,
-    "districtNameEn": "Mueang Phrae",
+    "districtNameEn": "Rong Kwang",
     "districtNameTh": "ร้องกวาง",
     "postalCode": 54140
   },
@@ -6699,7 +6699,7 @@
     "id": 838,
     "provinceCode": 84,
     "districtCode": 8419,
-    "districtNameEn": "Chai Buri",
+    "districtNameEn": "Wiphawadi",
     "districtNameTh": "วิภาวดี",
     "postalCode": 84180
   },

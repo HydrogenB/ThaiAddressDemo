@@ -25186,7 +25186,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380101,
-    "subdistrictNameEn": "Seka",
+    "subdistrictNameEn": "Bueng Kan",
     "subdistrictNameTh": "บึงกาฬ",
     "postalCode": 38000
   },
@@ -25195,7 +25195,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380102,
-    "subdistrictNameEn": "Sang ",
+    "subdistrictNameEn": "Non Sombun",
     "subdistrictNameTh": "โนนสมบูรณ์",
     "postalCode": 38000
   },
@@ -25204,7 +25204,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380103,
-    "subdistrictNameEn": "Tha Kok Daeng",
+    "subdistrictNameEn": "Non Sawang",
     "subdistrictNameTh": "โนนสว่าง",
     "postalCode": 38000
   },
@@ -25213,7 +25213,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380104,
-    "subdistrictNameEn": "Ban Tong",
+    "subdistrictNameEn": "Ho Kham",
     "subdistrictNameTh": "หอคำ",
     "postalCode": 38000
   },
@@ -25222,7 +25222,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380105,
-    "subdistrictNameEn": "Pong Hai",
+    "subdistrictNameEn": "Nong Loeng",
     "subdistrictNameTh": "หนองเลิง",
     "postalCode": 38000
   },
@@ -25231,7 +25231,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380106,
-    "subdistrictNameEn": "Nam Chan",
+    "subdistrictNameEn": "Khok Kong",
     "subdistrictNameTh": "โคกก่อง",
     "postalCode": 38000
   },
@@ -25240,7 +25240,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380107,
-    "subdistrictNameEn": "Tha Sa-At",
+    "subdistrictNameEn": "Na Sawan",
     "subdistrictNameTh": "นาสวรรค์",
     "postalCode": 38000
   },
@@ -25249,7 +25249,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380108,
-    "subdistrictNameEn": "Nong Thum",
+    "subdistrictNameEn": "Khai Si",
     "subdistrictNameTh": "ไคสี",
     "postalCode": 38000
   },
@@ -25258,7 +25258,7 @@
     "provinceCode": 38,
     "districtCode": 3801,
     "subdistrictCode": 380109,
-    "subdistrictNameEn": "Sok Kam",
+    "subdistrictNameEn": "Chai Phon",
     "subdistrictNameTh": "ชัยพร",
     "postalCode": 38000
   },
@@ -39210,7 +39210,7 @@
     "subdistrictCode": 502501,
     "subdistrictNameEn": "Ban Chan",
     "subdistrictNameTh": "บ้านจันทร์",
-    "postalCode": 58130
+    "postalCode": 50270
   },
   {
     "id": 4358,
@@ -39219,7 +39219,7 @@
     "subdistrictCode": 502502,
     "subdistrictNameEn": "Mae Dad",
     "subdistrictNameTh": "แม่แดด",
-    "postalCode": 58130
+    "postalCode": 50270
   },
   {
     "id": 4359,
@@ -39228,7 +39228,7 @@
     "subdistrictCode": 502503,
     "subdistrictNameEn": "Jam Luang",
     "subdistrictNameTh": "แจ่มหลวง",
-    "postalCode": 58130
+    "postalCode": 50270
   },
   {
     "id": 4360,
