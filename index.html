@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แก้ไขที่อยู่ - Thai Address Demo</title>
+    <meta name="description" content="สาธิตการกรอกที่อยู่แบบ Best Practice พร้อม Learning Panel สำหรับ Developer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left: Form Panel -->
+        <div class="form-panel">
+            <div class="container">
+                <!-- Header -->
+                <header class="header">
+                    <button class="back-btn" aria-label="กลับ">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="header-title">แก้ไขที่อยู่</h1>
+                </header>
+
+                <!-- Form -->
+                <form id="addressForm" class="address-form">
+                    <!-- รหัสไปรษณีย์ -->
+                    <div class="form-group" id="zipGroup">
+                        <label for="zipCode" class="form-label">รหัสไปรษณีย์<span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <input type="text" 
+                                   id="zipCode" 
+                                   name="zipCode" 
+                                   class="form-input" 
+                                   placeholder="กรอกรหัสไปรษณีย์"
+                                   maxlength="5"
+                                   inputmode="numeric"
+                                   autocomplete="off"
+                                   required>
+                            <button type="button" class="clear-btn" id="clearZip" aria-label="ล้าง">✕</button>
+                        </div>
+                        <div class="suggestions-dropdown" id="zipSuggestions"></div>
+                        <span class="error-message">กรุณากรอกรหัสไปรษณีย์</span>
+                    </div>
+
+                    <!-- จังหวัด -->
+                    <div class="form-group" id="provinceGroup">
+                        <label for="province" class="form-label">จังหวัด<span class="required">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="province" name="province" class="form-select" required>
+                                <option value="">เลือกจังหวัด</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                        <span class="error-message">กรุณาเลือกจังหวัด</span>
+                    </div>
+
+                    <!-- เขต/อำเภอ -->
+                    <div class="form-group" id="districtGroup">
+                        <label for="district" class="form-label">เขต/อำเภอ<span class="required">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="district" name="district" class="form-select" required>
+                                <option value="">เลือกเขต/อำเภอ</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                        <span class="error-message">กรุณาเลือกเขต/อำเภอ</span>
+                    </div>
+
+                    <!-- แขวง/ตำบล -->
+                    <div class="form-group" id="subdistrictGroup">
+                        <label for="subdistrict" class="form-label">แขวง/ตำบล<span class="required">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="subdistrict" name="subdistrict" class="form-select" required>
+                                <option value="">เลือกแขวง/ตำบล</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                        <span class="error-message">กรุณาเลือกแขวง/ตำบล</span>
+                    </div>
+
+                    <!-- บ้านเลขที่ and หมู่ Row -->
+                    <div class="form-row">
+                        <div class="form-group flex-1" id="houseNoGroup">
+                            <label for="houseNo" class="form-label">บ้านเลขที่<span class="required">*</span></label>
+                            <input type="text" id="houseNo" name="houseNo" class="form-input" placeholder="กรอกบ้านเลขที่" required>
+                            <span class="error-message">กรุณากรอกบ้านเลขที่</span>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="moo" class="form-label">หมู่</label>
+                            <input type="text" id="moo" name="moo" class="form-input" placeholder="กรอกหมู่">
+                        </div>
+                    </div>
+
+                    <!-- ซอย and หมู่บ้าน/อาคาร Row -->
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="soi" class="form-label">ซอย</label>
+                            <input type="text" id="soi" name="soi" class="form-input" placeholder="กรอกซอย">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="buildingName" class="form-label">หมู่บ้าน / อาคาร</label>
+                            <input type="text" id="buildingName" name="buildingName" class="form-input" placeholder="กรอกหมู่บ้าน/อาคาร">
+                        </div>
+                    </div>
+
+                    <!-- ถนน -->
+                    <div class="form-group">
+                        <label for="streetName" class="form-label">ถนน</label>
+                        <input type="text" id="streetName" name="streetName" class="form-input" placeholder="กรอกถนน">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn">ดำเนินการต่อ</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right: Learning Panel -->
+        <div class="learning-panel">
+            <div class="learning-header">
+                <h2>🎓 Learning Panel for Junior Developers</h2>
+                <p>ดูการทำงานของ Logic และ Pseudo Code แบบ Real-time</p>
+            </div>
+
+            <!-- Current State -->
+            <div class="learning-section">
+                <h3>📊 Current State</h3>
+                <div class="state-display" id="stateDisplay">
+                    <div class="state-item">
+                        <span class="state-label">Mode:</span>
+                        <span class="state-value" id="stateMode">ZIP_MODE</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Zip Data Count:</span>
+                        <span class="state-value" id="stateZipCount">0</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Selected Province:</span>
+                        <span class="state-value" id="stateProvince">-</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Selected District:</span>
+                        <span class="state-value" id="stateDistrict">-</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Selected Subdistrict:</span>
+                        <span class="state-value" id="stateSubdistrict">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pseudo Code -->
+            <div class="learning-section">
+                <h3>📝 Pseudo Code - Address Auto-fill Logic</h3>
+                <pre class="pseudo-code" id="pseudoCode">
+<span class="comment">// === Thai Address Auto-fill Algorithm ===</span>
+
+<span class="keyword">FUNCTION</span> onZipCodeInput(zipCode):
+    <span class="comment">// Step 1: Search matching zip codes</span>
+    results = <span class="function">searchZipCodes</span>(zipCode)
+    
+    <span class="keyword">IF</span> results.length > 0:
+        <span class="function">showSuggestions</span>(results)
+    <span class="keyword">ELSE</span>:
+        <span class="function">hideSuggestions</span>()
+
+<span class="keyword">FUNCTION</span> onZipCodeSelected(zipCode):
+    <span class="comment">// Step 2: Filter geography data by zip</span>
+    filteredData = <span class="function">filterByZipCode</span>(zipCode)
+    
+    <span class="comment">// Step 3: Extract unique provinces</span>
+    provinces = <span class="function">getUniqueProvinces</span>(filteredData)
+    <span class="function">populateDropdown</span>("province", provinces)
+    
+    <span class="comment">// Step 4: Auto-select if only one option</span>
+    <span class="keyword">IF</span> provinces.length == 1:
+        <span class="function">selectProvince</span>(provinces[0])
+        <span class="function">onProvinceChange</span>()
+
+<span class="keyword">FUNCTION</span> onProvinceChange(provinceCode):
+    <span class="comment">// Cascade: Filter districts</span>
+    districts = <span class="function">filterByProvince</span>(provinceCode)
+    <span class="function">populateDropdown</span>("district", districts)
+    
+    <span class="keyword">IF</span> districts.length == 1:
+        <span class="function">onDistrictChange</span>(districts[0])
+
+<span class="keyword">FUNCTION</span> onDistrictChange(districtCode):
+    <span class="comment">// Cascade: Filter subdistricts</span>
+    subdistricts = <span class="function">filterByDistrict</span>(districtCode)
+    <span class="function">populateDropdown</span>("subdistrict", subdistricts)
+
+<span class="comment">// === Edge Case: Manual Edit ===</span>
+<span class="keyword">FUNCTION</span> onManualEdit(field, value):
+    <span class="comment">// Switch to MANUAL_MODE</span>
+    mode = MANUAL_MODE
+    dataSource = fullGeographyData
+    
+    <span class="keyword">IF</span> field == "province":
+        <span class="function">updateDistrictOptions</span>()
+        <span class="function">clearSubdistrict</span>()
+    <span class="keyword">ELSE IF</span> field == "district":
+        <span class="function">updateSubdistrictOptions</span>()
+    <span class="keyword">ELSE IF</span> field == "subdistrict":
+        <span class="comment">// Sync zip code with selected area</span>
+        <span class="function">updateZipCode</span>(subdistrict.postalCode)
+                </pre>
+            </div>
+
+            <!-- Event Log -->
+            <div class="learning-section">
+                <h3>📋 Event Log (Real-time)</h3>
+                <div class="event-log" id="eventLog">
+                    <div class="log-entry log-info">🚀 Application initialized. Waiting for user input...</div>
+                </div>
+            </div>
+
+            <!-- Output Preview -->
+            <div class="learning-section">
+                <h3>📤 Output Preview (JSON)</h3>
+                <pre class="output-preview" id="outputPreview">{
+  "houseNo": "",
+  "soi": "",
+  "moo": "",
+  "buildingName": "",
+  "streetName": "",
+  "tumbon": "",
+  "amphur": "",
+  "city": "",
+  "zip": ""
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-brand">true</span>
+                <span class="modal-brand dtac">dtac</span>
+                <span class="modal-title">ยืนยันที่อยู่จัดส่งเอกสาร</span>
+            </div>
+            <div class="modal-body">
+                <div class="address-icon">📍</div>
+                <div class="address-content">
+                    <p class="address-label">ที่อยู่</p>
+                    <p class="address-text" id="confirmAddress"></p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-confirm" id="confirmBtn">ยืนยัน</button>
+                <button type="button" class="btn-cancel" id="cancelBtn">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

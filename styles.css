@@ -1,0 +1,564 @@
+/* ===== CSS Reset & Variables ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary-red: #E31837;
+    --primary-blue: #007AFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --text-placeholder: #999999;
+    --border-color: #E0E0E0;
+    --border-focus: #007AFF;
+    --border-error: #E31837;
+    --bg-white: #FFFFFF;
+    --bg-gray: #F5F5F5;
+    --bg-dark: #1E1E2E;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --transition: all 0.2s ease;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--bg-gray);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+/* ===== App Container - Two Panel Layout ===== */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== Form Panel (Left) ===== */
+.form-panel {
+    flex: 0 0 480px;
+    max-width: 480px;
+    background: var(--bg-white);
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== Header ===== */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    margin-left: -8px;
+    cursor: pointer;
+    color: var(--text-primary);
+    display: flex;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.back-btn:hover {
+    background: var(--bg-gray);
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* ===== Form ===== */
+.address-form {
+    flex: 1;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+/* ===== Form Group ===== */
+.form-group {
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.form-label .required {
+    color: var(--border-error);
+}
+
+/* ===== Input & Select ===== */
+.input-wrapper,
+.select-wrapper {
+    position: relative;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--bg-white);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: var(--transition);
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--text-placeholder);
+}
+
+.form-select {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 40px;
+}
+
+.form-select:disabled {
+    background: var(--bg-gray);
+    color: var(--text-placeholder);
+    cursor: not-allowed;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+/* ===== Clear Button ===== */
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-gray);
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.clear-btn:hover {
+    background: var(--border-color);
+}
+
+.form-input:not(:placeholder-shown) ~ .clear-btn,
+.clear-btn.show {
+    display: flex;
+}
+
+/* ===== Suggestions Dropdown ===== */
+.suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 50;
+    display: none;
+    box-shadow: var(--shadow-md);
+}
+
+.suggestions-dropdown.show {
+    display: block;
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: var(--transition);
+    border-bottom: 1px solid var(--bg-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: var(--bg-gray);
+}
+
+.suggestion-item .district-name {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* ===== Error State ===== */
+.form-group.error .form-input,
+.form-group.error .form-select {
+    border-color: var(--border-error);
+}
+
+.form-group.error .form-label {
+    color: var(--border-error);
+}
+
+.error-message {
+    display: none;
+    font-size: 12px;
+    color: var(--border-error);
+    margin-top: 4px;
+}
+
+.form-group.error .error-message {
+    display: block;
+}
+
+/* ===== Submit Button ===== */
+.submit-btn {
+    width: 100%;
+    height: 52px;
+    background: var(--primary-red);
+    color: var(--bg-white);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    margin-top: auto;
+    transition: var(--transition);
+}
+
+.submit-btn:hover {
+    background: #c41530;
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+/* ===== Learning Panel (Right) ===== */
+.learning-panel {
+    flex: 1;
+    background: var(--bg-dark);
+    color: #E0E0E0;
+    padding: 20px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
+.learning-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #3a3a4a;
+}
+
+.learning-header h2 {
+    font-size: 20px;
+    color: #FFD700;
+    margin-bottom: 8px;
+}
+
+.learning-header p {
+    color: #888;
+}
+
+.learning-section {
+    margin-bottom: 24px;
+    background: #2a2a3a;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+}
+
+.learning-section h3 {
+    font-size: 14px;
+    color: #4FC3F7;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===== State Display ===== */
+.state-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.state-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #1E1E2E;
+    border-radius: 4px;
+}
+
+.state-label {
+    color: #888;
+}
+
+.state-value {
+    color: #4FC3F7;
+    font-family: 'Fira Code', monospace;
+}
+
+/* ===== Pseudo Code ===== */
+.pseudo-code {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    background: #1E1E2E;
+    padding: 16px;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.pseudo-code .keyword {
+    color: #C792EA;
+}
+
+.pseudo-code .function {
+    color: #82AAFF;
+}
+
+.pseudo-code .comment {
+    color: #546E7A;
+}
+
+/* ===== Event Log ===== */
+.event-log {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #1E1E2E;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.log-entry {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background: #2a2a3a;
+}
+
+.log-entry:last-child {
+    margin-bottom: 0;
+}
+
+.log-info {
+    border-left: 3px solid #4FC3F7;
+}
+
+.log-action {
+    border-left: 3px solid #4CAF50;
+}
+
+.log-cascade {
+    border-left: 3px solid #FFD700;
+}
+
+.log-error {
+    border-left: 3px solid #F44336;
+}
+
+/* ===== Output Preview ===== */
+.output-preview {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    background: #1E1E2E;
+    padding: 16px;
+    border-radius: 4px;
+    color: #A5D6A7;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    background: var(--bg-white);
+    width: 90%;
+    max-width: 400px;
+    border-radius: var(--radius-md);
+    animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-red);
+}
+
+.modal-brand.dtac {
+    color: #00A8E8;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.modal-body {
+    padding: 20px;
+    display: flex;
+    gap: 12px;
+}
+
+.address-icon {
+    font-size: 24px;
+}
+
+.address-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.address-text {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.modal-actions {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-confirm,
+.btn-cancel {
+    width: 100%;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-confirm {
+    background: var(--primary-red);
+    color: var(--bg-white);
+    border: none;
+}
+
+.btn-cancel {
+    background: var(--bg-white);
+    color: var(--primary-red);
+    border: 2px solid var(--primary-red);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .form-panel {
+        flex: none;
+        max-width: 100%;
+    }
+    
+    .learning-panel {
+        display: none; /* Hide on mobile for cleaner UX */
+    }
+}
