@@ -3,8 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แก้ไขที่อยู่ - Thai Address Demo</title>
-    <meta name="description" content="สาธิตการกรอกที่อยู่แบบ Best Practice พร้อม Learning Panel สำหรับ Developer">
+    <title>Thai Address Auto-fill Algorithm - Developer Debug Console</title>
+    
+    <!-- Hyper SEO for Developers -->
+    <meta name="description" content="Open source Thai Address Auto-fill algorithm visualization for developers. Explore the logic behind cascading dropdowns (Province > District > Subdistrict) and Zip Code reverse lookup using a raw JSON dataset.">
+    <meta name="keywords" content="Thai Address API, Auto-fill Algorithm, Frontend Logic, JSON Dataset, Thai Geography Data, Developer Tool, Debug Console, Open Source, JavaScript, Pseudo Code">
+    <meta name="author" content="HydrogenB & Community">
+    <meta name="application-name" content="Thai Address Debug Console">
+    
+    <!-- Open Graph for Tech Platforms -->
+    <meta property="og:title" content="Thai Address Auto-fill Algorithm | Developer Console">
+    <meta property="og:description" content="Interactive debug console for Thai address auto-fill logic. Visualize algorithm steps, performance metrics, and state management in real-time.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hydrogenb.github.io/ThaiAddressDemo/">
+    <meta property="og:updated_time" content="2025-12-23T10:00:00+07:00">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Thai Address Logic Visualization">
+    <meta name="twitter:description" content="Debug and learn Thai Address Auto-fill algorithms with real-time state tracking and performance metrics.">
+
+    <!-- Structured Data (JSON-LD) for Software -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Thai Address Auto-fill Debugger",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "DeveloperApplication",
+      "description": "A developer tool to visualize and debug the logic behind Thai address auto-completion, featuring real-time state tracking and performance metrics.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Jirad Srirattana-arporn",
+        "url": "https://github.com/HydrogenB"
+      },
+      "codeRepository": "https://github.com/HydrogenB/ThaiAddressDemo",
+      "keywords": "Thai Address, JavaScript, Auto-fill, Algorithm"
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -131,74 +173,98 @@
             </div>
         </div>
 
-        <!-- Right: Learning Panel -->
+        <!-- Right: Debug Panel -->
         <div class="learning-panel">
             <div class="learning-header">
-                <h2>🎓 Learning Panel for Developers</h2>
-                <p>ดูการทำงานของ Logic และ Pseudo Code แบบ Real-time</p>
+                <h2>🛠️ Debug Panel (Developer Mode)</h2>
+                <p>Real-time Logic Visualization & State Tracking</p>
             </div>
 
-            <!-- Current State -->
+            <!-- Performance Metrics -->
             <div class="learning-section">
-                <h3>📊 Current State</h3>
-                <div class="state-display" id="stateDisplay">
-                    <div class="state-item">
-                        <span class="state-label">Mode:</span>
-                        <span class="state-value" id="stateMode">ZIP_MODE</span>
+                <h3>⚡ Performance Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <span class="metric-label">Last Render:</span>
+                        <span class="metric-value" id="metricRender">0 ms</span>
                     </div>
-                    <div class="state-item">
-                        <span class="state-label">Zip Data Count:</span>
-                        <span class="state-value" id="stateZipCount">0</span>
-                    </div>
-                    <div class="state-item">
-                        <span class="state-label">Selected Province:</span>
-                        <span class="state-value" id="stateProvince">-</span>
-                    </div>
-                    <div class="state-item">
-                        <span class="state-label">Selected District:</span>
-                        <span class="state-value" id="stateDistrict">-</span>
-                    </div>
-                    <div class="state-item">
-                        <span class="state-label">Selected Subdistrict:</span>
-                        <span class="state-value" id="stateSubdistrict">-</span>
+                    <div class="metric-item">
+                        <span class="metric-label">Filter Time:</span>
+                        <span class="metric-value" id="metricFilter">0 ms</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Pseudo Code -->
+            <!-- Variable Watch -->
             <div class="learning-section">
-                <h3>📝 Pseudo Code - Address Auto-fill Logic</h3>
+                <h3>🔍 Variable Watch</h3>
+                <div class="state-display" id="variableWatch">
+                    <div class="state-item">
+                        <span class="state-label">isManualMode:</span>
+                        <span class="state-value" id="varManualMode">false</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">currentLang:</span>
+                        <span class="state-value" id="varLang">"th"</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">selectedZipData.length:</span>
+                        <span class="state-value" id="varZipDataLen">0</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">activeProvince:</span>
+                        <span class="state-value" id="varProvince">null</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">activeDistrict:</span>
+                        <span class="state-value" id="varDistrict">null</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Pseudo Code -->
+            <div class="learning-section">
+                <h3>📜 Logic Flow (Pseudo Code)</h3>
                 <div class="pseudo-code" id="pseudoCode">
 <div class="code-line" data-line="init"><span class="comment">// === Thai Address Auto-fill Algorithm ===</span></div>
-<div class="code-line" data-line="zip-input"><span class="keyword">FUNCTION</span> onZipCodeInput(zipCode):</div>
-<div class="code-line" data-line="zip-search">    results = <span class="function">searchZipCodes</span>(zipCode)</div>
-<div class="code-line" data-line="zip-show">    <span class="keyword">IF</span> results.length > 0: <span class="function">showSuggestions</span>(results)</div>
-<div class="code-line" data-line="zip-selected"><span class="keyword">FUNCTION</span> onZipCodeSelected(zipCode):</div>
-<div class="code-line" data-line="zip-filter">    filteredData = <span class="function">filterByZipCode</span>(zipCode)</div>
-<div class="code-line" data-line="zip-province">    provinces = <span class="function">getUniqueProvinces</span>(filteredData)</div>
-<div class="code-line" data-line="zip-populate">    <span class="function">populateDropdown</span>("province", provinces)</div>
-<div class="code-line" data-line="province-change"><span class="keyword">FUNCTION</span> onProvinceChange(provinceCode):</div>
-<div class="code-line" data-line="province-filter">    districts = <span class="function">filterByProvince</span>(provinceCode)</div>
-<div class="code-line" data-line="province-populate">    <span class="function">populateDropdown</span>("district", districts)</div>
-<div class="code-line" data-line="district-change"><span class="keyword">FUNCTION</span> onDistrictChange(districtCode):</div>
-<div class="code-line" data-line="district-filter">    subdistricts = <span class="function">filterByDistrict</span>(districtCode)</div>
-<div class="code-line" data-line="district-populate">    <span class="function">populateDropdown</span>("subdistrict", subdistricts)</div>
-<div class="code-line" data-line="subdistrict-change"><span class="keyword">FUNCTION</span> onSubdistrictChange():</div>
-<div class="code-line" data-line="subdistrict-sync">    <span class="function">syncZipCode</span>(subdistrict.postalCode)</div>
+<div class="code-line" data-line="input-event"><span class="function">onZipInput(input)</span>:</div>
+<div class="code-line" data-line="validate-zip">  <span class="keyword">IF</span> input != numeric <span class="keyword">RETURN</span></div>
+<div class="code-line" data-line="search-zip">  matches = <span class="function">searchZipCodes</span>(input)</div>
+<div class="code-line" data-line="render-suggestion">  <span class="keyword">IF</span> matches > 0 <span class="function">renderSuggestions</span>(matches)</div>
+
+<div class="code-line" data-line="select-zip"><span class="function">onZipSelected(zip)</span>:</div>
+<div class="code-line" data-line="fetch-data">  rawData = <span class="function">getDataByZip</span>(zip)</div>
+<div class="code-line" data-line="extract-provinces">  provinces = <span class="function">uniqueProvinces</span>(rawData)</div>
+<div class="code-line" data-line="render-province">  <span class="function">updateDropdown</span>("province", provinces)</div>
+<div class="code-line" data-line="auto-select-province">  <span class="keyword">IF</span> provinces.len == 1 <span class="function">selectProvince</span>(provinces[0])</div>
+
+<div class="code-line" data-line="change-province"><span class="function">onProvinceChange(provId)</span>:</div>
+<div class="code-line" data-line="filter-district">  districts = <span class="function">getDistricts</span>(provId)</div>
+<div class="code-line" data-line="render-district">  <span class="function">updateDropdown</span>("district", districts)</div>
+<div class="code-line" data-line="reset-sub">  <span class="function">resetDropdown</span>("subdistrict")</div>
+<div class="code-line" data-line="auto-select-district">  <span class="keyword">IF</span> districts.len == 1 <span class="function">selectDistrict</span>(districts[0])</div>
+
+<div class="code-line" data-line="change-district"><span class="function">onDistrictChange(distId)</span>:</div>
+<div class="code-line" data-line="filter-sub">  subdistricts = <span class="function">getSubdistricts</span>(distId)</div>
+<div class="code-line" data-line="render-sub">  <span class="function">updateDropdown</span>("subdistrict", subdistricts)</div>
+<div class="code-line" data-line="auto-select-sub">  <span class="keyword">IF</span> subdistricts.len == 1 <span class="function">selectSubdistrict</span>(subdistricts[0])</div>
+
+<div class="code-line" data-line="change-sub"><span class="function">onSubdistrictChange(subId)</span>:</div>
+<div class="code-line" data-line="sync-zip">  <span class="keyword">IF</span> subId.zip != currentZip <span class="function">updateZip</span>(subId.zip)</div>
                 </div>
             </div>
 
             <!-- Event Log -->
             <div class="learning-section">
-                <h3>📋 Event Log (Real-time)</h3>
+                <h3>📝 Runtime Logs</h3>
                 <div class="event-log" id="eventLog">
-                    <div class="log-entry log-info">🚀 Application initialized. Waiting for user input...</div>
+                    <div class="log-entry log-info"><span class="log-time">00:00:00</span> System ready.</div>
                 </div>
             </div>
 
             <!-- Output Preview -->
             <div class="learning-section">
-                <h3>📤 Output Preview (JSON)</h3>
+                <h3>📤 Form Data State</h3>
                 <pre class="output-preview" id="outputPreview">{
   "houseNo": "",
   "soi": "",
@@ -214,70 +280,26 @@
 
             <!-- GitHub & Credits -->
             <div class="learning-section credits-section">
-                <h3>🤝 Contribute & Credits</h3>
+                <h3>🤝 Source Code</h3>
                 
                 <div class="github-link">
                     <a href="https://github.com/HydrogenB/ThaiAddressDemo" target="_blank" rel="noopener noreferrer">
                         <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                         </svg>
-                        <span>GitHub - HydrogenB/ThaiAddressDemo</span>
+                        <span>HydrogenB/ThaiAddressDemo</span>
                     </a>
-                    <p class="contribute-text">พบข้อมูลผิดพลาด? ช่วย Contribute ได้เลย!</p>
                 </div>
 
                 <div class="credits-info">
-                    <h4>📚 Data Source</h4>
-                    <p>ข้อมูลตำบล/อำเภอ/จังหวัดตั้งต้นจาก <a href="https://github.com/kongvut/thai-province-data" target="_blank" rel="noopener noreferrer">thai-province-data</a> โดย Kongvut Sangkla<br>
-                    และ update โดย <a href="https://th.linkedin.com/in/jirads" target="_blank" rel="noopener noreferrer">Jirad Srirattana-arporn</a></p>
+                    <h4>📚 Data Reference</h4>
+                    <p>Geography data sourced from:<br>
+                    <a href="https://github.com/thailand-geography-data/thailand-geography-json" target="_blank" rel="noopener noreferrer">thailand-geography-data/thailand-geography-json</a></p>
                     
                     <div class="download-buttons">
                         <a href="geography.json" download class="btn-download">
-                            <span>📥</span> geography.json
+                            <span>📦</span> geography.json
                         </a>
-                        <a href="provinces.json" download class="btn-download">
-                            <span>📥</span> provinces.json
-                        </a>
-                        <a href="districts.json" download class="btn-download">
-                            <span>📥</span> districts.json
-                        </a>
-                        <a href="subdistricts.json" download class="btn-download">
-                            <span>📥</span> subdistricts.json
-                        </a>
-                    </div>
-                    
-                    <h4>📝 Changelog</h4>
-                    <div class="changelog">
-                        <div class="changelog-entry">
-                            <span class="changelog-date">2024-12-23</span>
-                            <span class="changelog-tag tag-fix">FIX</span>
-                            <span class="changelog-desc">แก้ไขรหัสไปรษณีย์ อ.กัลยาณิวัฒนา (5025): 58130 → 50270</span>
-                        </div>
-                        <div class="changelog-entry">
-                            <span class="changelog-date">2024-12-23</span>
-                            <span class="changelog-tag tag-fix">FIX</span>
-                            <span class="changelog-desc">แก้ไขชื่ออังกฤษตำบลใน อ.เมืองบึงกาฬ (3801) ที่สลับกับ อ.เซกา</span>
-                        </div>
-                        <div class="changelog-entry">
-                            <span class="changelog-date">2024-12-22</span>
-                            <span class="changelog-tag tag-fix">FIX</span>
-                            <span class="changelog-desc">แก้ไข districtNameEn ผิดพลาด: 3103, 3107, 5402, 8419 ใน districts.json</span>
-                        </div>
-                        <div class="changelog-entry">
-                            <span class="changelog-date">2024-12-22</span>
-                            <span class="changelog-tag tag-new">NEW</span>
-                            <span class="changelog-desc">เพิ่ม Learning Panel สำหรับ Developer พร้อม Real-time State, Pseudo Code, Event Log</span>
-                        </div>
-                        <div class="changelog-entry">
-                            <span class="changelog-date">2024-12-22</span>
-                            <span class="changelog-tag tag-new">NEW</span>
-                            <span class="changelog-desc">เพิ่ม Manual Mode รองรับการแก้ไข Province/District/Subdistrict ด้วยตนเอง</span>
-                        </div>
-                        <div class="changelog-entry">
-                            <span class="changelog-date">2024-12-22</span>
-                            <span class="changelog-tag tag-new">NEW</span>
-                            <span class="changelog-desc">สร้างเว็บ Thai Address Demo พร้อม Auto-fill จาก Zip Code</span>
-                        </div>
                     </div>
                 </div>
             </div>

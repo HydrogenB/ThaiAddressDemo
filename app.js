@@ -58,11 +58,6 @@ const langToggle = document.getElementById('langToggle');
 // Learning Panel Elements
 const eventLog = document.getElementById('eventLog');
 const outputPreview = document.getElementById('outputPreview');
-const stateMode = document.getElementById('stateMode');
-const stateZipCount = document.getElementById('stateZipCount');
-const stateProvince = document.getElementById('stateProvince');
-const stateDistrict = document.getElementById('stateDistrict');
-const stateSubdistrict = document.getElementById('stateSubdistrict');
 
 // ===== LANGUAGE FUNCTIONS =====
 function toggleLanguage() {
@@ -110,8 +105,7 @@ function toggleLanguage() {
         subdistrictSelect.innerHTML = `<option value="">${uiLabels.subdistrictPlaceholder[currentLang]}</option>`;
     }
     
-    updateState();
-    updateOutputPreview();
+    updateDebugPanel();
 }
 
 function updateUILabels() {
@@ -186,18 +180,6 @@ function log(message, type = 'info') {
     }
 }
 
-function updateState() {
-    stateMode.textContent = isManualMode ? 'MANUAL_MODE' : 'ZIP_MODE';
-    stateZipCount.textContent = selectedZipData.length;
-    stateProvince.textContent = provinceSelect.options[provinceSelect.selectedIndex]?.text || '-';
-    stateDistrict.textContent = districtSelect.options[districtSelect.selectedIndex]?.text || '-';
-    stateSubdistrict.textContent = subdistrictSelect.options[subdistrictSelect.selectedIndex]?.text || '-';
-}
-
-function updateOutputPreview() {
-    const data = getFormData();
-    outputPreview.textContent = JSON.stringify(data, null, 2);
-}
 
 // Highlight active pseudo code line
 function highlightCode(lineId) {
@@ -489,40 +471,79 @@ function populateSubdistricts(subdistricts) {
 
 // ===== EVENT HANDLERS =====
 
+// ===== DEBUG PANEL FUNCTIONS =====
+
+function updateDebugPanel(metrics = {}) {
+    // 1. Update Variable Watch
+    document.getElementById('varManualMode').textContent = isManualMode;
+    document.getElementById('varLang').textContent = `"${currentLang}"`;
+    document.getElementById('varZipDataLen').textContent = selectedZipData.length;
+    
+    const provText = provinceSelect.options[provinceSelect.selectedIndex]?.text;
+    document.getElementById('varProvince').textContent = provText && provText !== uiLabels.provincePlaceholder[currentLang] ? `"${provText}"` : 'null';
+    
+    const distText = districtSelect.options[districtSelect.selectedIndex]?.text;
+    document.getElementById('varDistrict').textContent = distText && distText !== uiLabels.districtPlaceholder[currentLang] ? `"${distText}"` : 'null';
+
+    // 2. Update Performance Metrics
+    if (metrics.renderTime !== undefined) {
+        document.getElementById('metricRender').textContent = `${metrics.renderTime.toFixed(2)} ms`;
+    }
+    if (metrics.filterTime !== undefined) {
+        document.getElementById('metricFilter').textContent = `${metrics.filterTime.toFixed(2)} ms`;
+    }
+
+    // 3. Update Output Preview
+    updateOutputPreview();
+}
+
+// ===== EVENT HANDLERS (DEBUG ENHANCED) =====
+
 /**
  * Handle when zip code is selected
  */
 function onZipCodeSelected(zipCode) {
     log(`📍 onZipCodeSelected("${zipCode}")`, 'cascade');
-    highlightCode('zip-filter');
+    highlightCode('select-zip');
     
+    const startFilter = performance.now();
+    
+    // Step: Select Zip -> Fetch Data
+    highlightCode('fetch-data');
     selectedZipData = getDataByZipCode(zipCode);
     
     if (selectedZipData.length === 0) {
         log('⚠️ No data found for this zip code', 'error');
+        updateDebugPanel({ filterTime: performance.now() - startFilter });
         return;
     }
     
-    log(`   → Found ${selectedZipData.length} records for this zip`, 'info');
-    
-    // Populate provinces from zip-filtered data
-    highlightCode('zip-province');
+    // Step: Extract Unique Provinces
+    highlightCode('extract-provinces');
     const provinces = getUniqueProvinces(selectedZipData);
+    
+    const endFilter = performance.now();
+    const filterTime = endFilter - startFilter;
+    
+    // Step: Render Provinces
+    highlightCode('render-province');
+    const startRender = performance.now();
     populateProvinces(provinces);
+    const renderTime = performance.now() - startRender;
     
-    log(`   → Populated ${provinces.length} province(s)`, 'info');
-    highlightCode('zip-populate');
+    log(`   → Found ${selectedZipData.length} records. Populated ${provinces.length} province(s)`, 'info');
     
-    // Auto-select if only one province
+    updateDebugPanel({ filterTime, renderTime });
+
+    // Step: Auto-select Province
     if (provinces.length === 1) {
+        highlightCode('auto-select-province');
         provinceSelect.value = provinces[0].code;
         log(`   → Auto-selected province: ${provinces[0].nameTh}`, 'cascade');
         onProvinceChange(false);
+    } else {
+        document.getElementById('zipGroup').classList.remove('error');
     }
-    
-    document.getElementById('zipGroup').classList.remove('error');
-    updateState();
-    updateOutputPreview();
 }
 
 /**
@@ -534,7 +555,7 @@ function onProvinceChange(isUserAction = true) {
     
     if (isUserAction) {
         log(`👤 User changed province to: ${provinceSelect.options[provinceSelect.selectedIndex]?.text}`, 'action');
-        highlightCode('province-change');
+        highlightCode('change-province');
         
         // Switch to manual mode when user manually changes
         if (provinceCode) {
@@ -548,32 +569,44 @@ function onProvinceChange(isUserAction = true) {
         districtSelect.disabled = true;
         subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
         subdistrictSelect.disabled = true;
-        updateState();
+        updateDebugPanel();
         return;
     }
     
-    // Get districts from appropriate data source
-    highlightCode('province-filter');
+    const startFilter = performance.now();
+    
+    // Step: Filter Districts
+    highlightCode('filter-district');
     const dataSource = getActiveDataSource();
     const districts = getDistrictsByProvince(dataSource, provinceCode);
+    
+    const endFilter = performance.now();
+    const filterTime = endFilter - startFilter;
+    
+    // Step: Render Districts
+    highlightCode('render-district');
+    const startRender = performance.now();
     populateDistricts(districts);
+    const renderTime = performance.now() - startRender;
     
+    // Step: Reset Subdistrict
+    highlightCode('reset-sub');
+    subdistrictSelect.innerHTML = `<option value="">${uiLabels.subdistrictPlaceholder[currentLang]}</option>`;
+    subdistrictSelect.disabled = true;
+
     log(`   → Populated ${districts.length} district(s)`, 'cascade');
-    highlightCode('province-populate');
     
-    // Auto-select if only one district
+    updateDebugPanel({ filterTime, renderTime });
+
+    // Step: Auto-select District
     if (districts.length === 1) {
+        highlightCode('auto-select-district');
         districtSelect.value = districts[0].code;
         log(`   → Auto-selected district: ${districts[0].nameTh}`, 'cascade');
         onDistrictChange(false);
     } else {
-        subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
-        subdistrictSelect.disabled = true;
+        document.getElementById('provinceGroup').classList.remove('error');
     }
-    
-    document.getElementById('provinceGroup').classList.remove('error');
-    updateState();
-    updateOutputPreview();
 }
 
 /**
@@ -584,7 +617,7 @@ function onDistrictChange(isUserAction = true) {
     
     if (isUserAction) {
         log(`👤 User changed district to: ${districtSelect.options[districtSelect.selectedIndex]?.text}`, 'action');
-        highlightCode('district-change');
+        highlightCode('change-district');
         
         if (districtCode) {
             isManualMode = true;
@@ -594,29 +627,39 @@ function onDistrictChange(isUserAction = true) {
     if (!districtCode) {
         subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
         subdistrictSelect.disabled = true;
-        updateState();
+        updateDebugPanel();
         return;
     }
     
-    // Get subdistricts from appropriate data source
-    highlightCode('district-filter');
+    const startFilter = performance.now();
+    
+    // Step: Filter Subdistricts
+    highlightCode('filter-sub');
     const dataSource = getActiveDataSource();
     const subdistricts = getSubdistrictsByDistrict(dataSource, districtCode);
+    
+    const endFilter = performance.now();
+    const filterTime = endFilter - startFilter;
+    
+    // Step: Render Subdistricts
+    highlightCode('render-sub');
+    const startRender = performance.now();
     populateSubdistricts(subdistricts);
+    const renderTime = performance.now() - startRender;
     
     log(`   → Populated ${subdistricts.length} subdistrict(s)`, 'cascade');
-    highlightCode('district-populate');
     
-    // Auto-select if only one subdistrict
+    updateDebugPanel({ filterTime, renderTime });
+
+    // Step: Auto-select Subdistrict
     if (subdistricts.length === 1) {
+        highlightCode('auto-select-sub');
         subdistrictSelect.value = subdistricts[0].code;
         log(`   → Auto-selected subdistrict: ${subdistricts[0].nameTh}`, 'cascade');
         onSubdistrictChange(false);
+    } else {
+        document.getElementById('districtGroup').classList.remove('error');
     }
-    
-    document.getElementById('districtGroup').classList.remove('error');
-    updateState();
-    updateOutputPreview();
 }
 
 /**
@@ -625,7 +668,7 @@ function onDistrictChange(isUserAction = true) {
 function onSubdistrictChange(isUserAction = true) {
     if (isUserAction) {
         log(`👤 User changed subdistrict to: ${subdistrictSelect.options[subdistrictSelect.selectedIndex]?.text}`, 'action');
-        highlightCode('subdistrict-change');
+        highlightCode('change-sub');
     }
     
     // Sync zip code with selected subdistrict
@@ -634,16 +677,15 @@ function onSubdistrictChange(isUserAction = true) {
         const newZip = selectedOption.dataset.zip;
         
         if (newZip && newZip !== zipCodeInput.value) {
+            highlightCode('sync-zip');
             zipCodeInput.value = newZip;
-            highlightCode('subdistrict-sync');
             log(`   → Synced zip code to: ${newZip}`, 'cascade');
             document.getElementById('zipGroup').classList.remove('error');
         }
     }
     
     document.getElementById('subdistrictGroup').classList.remove('error');
-    updateState();
-    updateOutputPreview();
+    updateDebugPanel();
 }
 
 /**
@@ -657,8 +699,7 @@ function resetLocationDropdowns() {
     selectedZipData = [];
     isManualMode = false;
     
-    updateState();
-    updateOutputPreview();
+    updateDebugPanel();
 }
 
 // ===== FORM FUNCTIONS =====
@@ -771,29 +812,44 @@ function initEventListeners() {
 
     // Zip code input
     zipCodeInput.addEventListener('input', (e) => {
+        highlightCode('input-event');
         const value = e.target.value.replace(/\D/g, ''); // Numbers only
         e.target.value = value;
         
         // Show/hide clear button
         clearZipBtn.classList.toggle('show', value.length > 0);
         
+        if (value.length > 0) {
+            highlightCode('validate-zip');
+        }
+
         if (value.length >= 1) {
-            highlightCode('zip-input');
-            showZipSuggestions(value);
+            const startSearch = performance.now();
+            
+            highlightCode('search-zip');
+            const matches = searchZipCodes(value);
+            
+            if (matches.length > 0) {
+                highlightCode('render-suggestion');
+                showZipSuggestions(value);
+            } else {
+                zipSuggestions.classList.remove('show');
+            }
+            
+            const searchTime = performance.now() - startSearch;
+            updateDebugPanel({ filterTime: searchTime });
         } else {
             zipSuggestions.classList.remove('show');
             resetLocationDropdowns();
+            updateDebugPanel();
         }
         
         // Auto-select if exactly 5 digits
         if (value.length === 5) {
             hideZipSuggestions();
-            highlightCode('zip-selected');
             isManualMode = false;
             onZipCodeSelected(value);
         }
-        
-        updateOutputPreview();
     });
     
     zipCodeInput.addEventListener('blur', hideZipSuggestions);
