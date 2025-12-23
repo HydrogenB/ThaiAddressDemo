@@ -502,6 +502,39 @@ body {
     color: #A5D6A7;
 }
 
+/* ===== Metrics Grid ===== */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #1E1E2E;
+    border-radius: 4px;
+}
+
+.metric-label {
+    color: #888;
+    font-size: 12px;
+}
+
+.metric-value {
+    color: #4CAF50;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+}
+
+/* ===== Log Time ===== */
+.log-time {
+    color: #666;
+    margin-right: 8px;
+}
+
+
 /* ===== Modal ===== */
 .modal-overlay {
     position: fixed;

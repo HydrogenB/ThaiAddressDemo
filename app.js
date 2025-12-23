@@ -55,14 +55,20 @@ const cancelBtn = document.getElementById('cancelBtn');
 const confirmAddress = document.getElementById('confirmAddress');
 const langToggle = document.getElementById('langToggle');
 
-// Learning Panel Elements
+// Debug Panel Elements
 const eventLog = document.getElementById('eventLog');
 const outputPreview = document.getElementById('outputPreview');
-const stateMode = document.getElementById('stateMode');
-const stateZipCount = document.getElementById('stateZipCount');
-const stateProvince = document.getElementById('stateProvince');
-const stateDistrict = document.getElementById('stateDistrict');
-const stateSubdistrict = document.getElementById('stateSubdistrict');
+
+// Variable Watch Elements
+const varManualMode = document.getElementById('varManualMode');
+const varLang = document.getElementById('varLang');
+const varZipDataLen = document.getElementById('varZipDataLen');
+const varProvince = document.getElementById('varProvince');
+const varDistrict = document.getElementById('varDistrict');
+
+// Performance Metric Elements
+const metricRender = document.getElementById('metricRender');
+const metricFilter = document.getElementById('metricFilter');
 
 // ===== LANGUAGE FUNCTIONS =====
 function toggleLanguage() {
@@ -172,11 +178,12 @@ function updateUILabels() {
     cancelBtn.textContent = uiLabels.cancelBtn[currentLang];
 }
 
-// ===== LOGGING FUNCTIONS (For Learning Panel) =====
+// ===== LOGGING FUNCTIONS (For Debug Panel) =====
 function log(message, type = 'info') {
     const entry = document.createElement('div');
     entry.className = `log-entry log-${type}`;
-    entry.textContent = `${new Date().toLocaleTimeString()} | ${message}`;
+    const timeStr = new Date().toLocaleTimeString('en-GB');
+    entry.innerHTML = `<span class="log-time">${timeStr}</span> ${message}`;
     eventLog.appendChild(entry);
     eventLog.scrollTop = eventLog.scrollHeight;
     
@@ -186,12 +193,29 @@ function log(message, type = 'info') {
     }
 }
 
+/**
+ * Validate Thai zip code format
+ * Thai postal codes: 5 digits, starting with 1-9 (e.g., 10100, 50200)
+ */
+function validateZipFormat(zip) {
+    const pattern = /^[1-9]\d{4}$/;
+    return pattern.test(zip);
+}
+
+/**
+ * Update Debug Panel - Variable Watch section
+ */
+function updateDebugPanel() {
+    if (varManualMode) varManualMode.textContent = isManualMode ? 'true' : 'false';
+    if (varLang) varLang.textContent = `"${currentLang}"`;
+    if (varZipDataLen) varZipDataLen.textContent = selectedZipData.length;
+    if (varProvince) varProvince.textContent = provinceSelect.value || 'null';
+    if (varDistrict) varDistrict.textContent = districtSelect.value || 'null';
+}
+
 function updateState() {
-    stateMode.textContent = isManualMode ? 'MANUAL_MODE' : 'ZIP_MODE';
-    stateZipCount.textContent = selectedZipData.length;
-    stateProvince.textContent = provinceSelect.options[provinceSelect.selectedIndex]?.text || '-';
-    stateDistrict.textContent = districtSelect.options[districtSelect.selectedIndex]?.text || '-';
-    stateSubdistrict.textContent = subdistrictSelect.options[subdistrictSelect.selectedIndex]?.text || '-';
+    // Update Debug Panel
+    updateDebugPanel();
 }
 
 function updateOutputPreview() {
@@ -248,24 +272,6 @@ async function loadGeographyData() {
         provinceSelect.innerHTML = '<option value="">เลือกจังหวัด</option>';
         districtSelect.innerHTML = '<option value="">เลือกเขต/อำเภอ</option>';
         subdistrictSelect.innerHTML = '<option value="">เลือกแขวง/ตำบล</option>';
-        
-        // Show error in the form panel
-        const formPanel = document.querySelector('.address-form');
-        if (formPanel) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'load-error';
-            errorDiv.innerHTML = `
-                <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-                    <strong style="color: #856404;">⚠️ ไม่สามารถโหลดข้อมูลที่อยู่ได้</strong>
-                    <p style="color: #856404; margin: 8px 0 0 0; font-size: 14px;">
-                        ${window.location.protocol === 'file:' 
-                            ? 'กรุณาเปิดผ่าน Web Server (เช่น GitHub Pages, Live Server)' 
-                            : 'กรุณาตรวจสอบว่าไฟล์ geography.json อยู่ถูกที่'}
-                    </p>
-                </div>
-            `;
-            formPanel.insertBefore(errorDiv, formPanel.firstChild);
-        }
     }
 }
 
@@ -769,31 +775,46 @@ function initEventListeners() {
         langToggle.addEventListener('click', toggleLanguage);
     }
 
-    // Zip code input
+    // Zip code input with validation
     zipCodeInput.addEventListener('input', (e) => {
-        const value = e.target.value.replace(/\D/g, ''); // Numbers only
+        const startTime = performance.now();
+        highlightCode('input-event');
+        
+        // Step 1: Sanitize - remove non-numeric
+        const value = e.target.value.replace(/\D/g, '');
         e.target.value = value;
+        highlightCode('validate-zip');
         
         // Show/hide clear button
         clearZipBtn.classList.toggle('show', value.length > 0);
         
         if (value.length >= 1) {
-            highlightCode('zip-input');
+            highlightCode('search-zip');
+            const filterStart = performance.now();
             showZipSuggestions(value);
+            if (metricFilter) metricFilter.textContent = `${(performance.now() - filterStart).toFixed(2)} ms`;
+            highlightCode('render-suggestion');
         } else {
             zipSuggestions.classList.remove('show');
             resetLocationDropdowns();
         }
         
-        // Auto-select if exactly 5 digits
+        // Step 2: Validate format (5 digits, starts with 1-9)
         if (value.length === 5) {
-            hideZipSuggestions();
-            highlightCode('zip-selected');
-            isManualMode = false;
-            onZipCodeSelected(value);
+            if (validateZipFormat(value)) {
+                log(`✅ Zip format valid: ${value}`, 'action');
+                hideZipSuggestions();
+                highlightCode('select-zip');
+                isManualMode = false;
+                onZipCodeSelected(value);
+            } else {
+                log(`⚠️ Invalid zip format: ${value} (must start with 1-9)`, 'error');
+            }
         }
         
         updateOutputPreview();
+        updateDebugPanel();
+        if (metricRender) metricRender.textContent = `${(performance.now() - startTime).toFixed(2)} ms`;
     });
     
     zipCodeInput.addEventListener('blur', hideZipSuggestions);
